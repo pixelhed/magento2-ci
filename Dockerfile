@@ -1,4 +1,6 @@
-FROM php:7.1-apache
+FROM php:7.2-apache
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -12,14 +14,14 @@ RUN apt-get update \
         libicu-dev \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
-        libpng12-dev \
+        libpng-dev \
         libgd-dev \
         libxslt1.1 \
         libxslt1-dev \
-    && docker-php-ext-configure mcrypt --with-mcrypt \
+        rsync \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install \
-        mcrypt \
+        bcmath \
         intl \
         gd \
         exif \
@@ -28,6 +30,8 @@ RUN apt-get update \
         pdo_mysql \
         soap \
         zip
+
+ADD ./php/custom.ini /usr/local/etc/php/conf.d/custom.ini
 
 # create composer cache-directory
 RUN mkdir -p /.composer
