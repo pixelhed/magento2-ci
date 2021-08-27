@@ -1,8 +1,8 @@
-FROM php:7.2-apache
+FROM php:7.3-apache
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-RUN apt-get update \
+RUN apt-get --allow-releaseinfo-change update \
     && apt-get install -y --no-install-recommends \
         git \
         wget \
@@ -21,6 +21,8 @@ RUN apt-get update \
         rsync \
         gpg \
         dirmngr \
+        gpg-agent \
+        libzip-dev \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install \
         bcmath \
@@ -31,7 +33,8 @@ RUN apt-get update \
         mysqli \
         pdo_mysql \
         soap \
-        zip
+        zip \
+        sockets
 
 ADD ./php/custom.ini /usr/local/etc/php/conf.d/custom.ini
 
@@ -39,7 +42,8 @@ ADD ./php/custom.ini /usr/local/etc/php/conf.d/custom.ini
 RUN mkdir -p /.composer
 
 # install Composer and make it available in the PATH
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
+RUN curl -sS https://getcomposer.org/download/1.10.17/composer.phar -o /usr/local/bin/composer
+RUN chmod +x /usr/local/bin/composer
 
 # composer parallel install plugin
 RUN composer global require "hirak/prestissimo:^0.3"
@@ -71,7 +75,7 @@ RUN set -ex \
   done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 10.13.0
+ENV NODE_VERSION 12.13.0
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
   && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -81,7 +85,7 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
   && rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
   && ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
-ENV YARN_VERSION 1.17.3
+ENV YARN_VERSION 1.19.1
 
 
 
