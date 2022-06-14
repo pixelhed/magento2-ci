@@ -1,4 +1,4 @@
-FROM php:7.3-apache
+FROM php:7.4-apache
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
@@ -23,7 +23,7 @@ RUN apt-get --allow-releaseinfo-change update \
         dirmngr \
         gpg-agent \
         libzip-dev \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install \
         bcmath \
         intl \
